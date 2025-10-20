@@ -162,6 +162,198 @@
         font-size: 14px;
         z-index: 2000;
       }
+
+      .fab {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        font-size: 32px;
+        line-height: 0;
+        box-shadow: 0 10px 20px rgba(118, 75, 162, 0.3);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 999;
+      }
+
+      .fab i {
+        width: 28px;
+        height: 28px;
+        stroke-width: 2.5;
+      }
+
+      /* Modal Styles */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 3000;
+        animation: fadeIn 0.2s;
+      }
+
+      .modal-overlay.active {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 16px;
+        max-width: 400px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        animation: slideUp 0.3s;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      }
+
+      @keyframes slideUp {
+        from {
+          transform: translateY(50px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      .modal-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 16px 16px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .modal-header h2 {
+        font-size: 20px;
+        margin: 0;
+      }
+
+      .modal-close {
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 28px;
+        cursor: pointer;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background 0.2s;
+      }
+
+      .modal-close:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .modal-body {
+        padding: 20px;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #333;
+        font-size: 14px;
+      }
+
+      .form-group input,
+      .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        font-family: inherit;
+        transition: border-color 0.2s;
+      }
+
+      .form-group input:focus,
+      .form-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+
+      .form-group textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      #addMap {
+        height: 200px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 2px solid #e0e0e0;
+      }
+
+      .location-hint {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .btn-primary {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn-primary:active {
+        transform: translateY(0);
+      }
+
+      .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
     </style>
   </head>
   <body>
@@ -172,6 +364,10 @@
 
     <div id="map"></div>
     <div class="loading" id="loading">Loading map...</div>
+
+    <button class="fab" id="openAddModal" aria-label="Create report">
+      <i data-lucide="plus"></i>
+    </button>
 
     <footer class="bottom-nav">
       <a href="/" class="nav-item">
@@ -192,6 +388,64 @@
       </a>
     </footer>
 
+    <!-- Add Report Modal -->
+    <div class="modal-overlay" id="addModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Report a Pothole</h2>
+          <button class="modal-close" id="closeModal" aria-label="Close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="addReportForm">
+            <div class="form-group">
+              <label for="reportTitle">Title *</label>
+              <input
+                type="text"
+                id="reportTitle"
+                name="title"
+                placeholder="Brief description of the issue"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="reportDescription">Description *</label>
+              <textarea
+                id="reportDescription"
+                name="description"
+                placeholder="Provide more details about the pothole..."
+                required
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="reportLocation">Location *</label>
+              <input
+                type="text"
+                id="reportLocation"
+                name="location"
+                placeholder="Street address or landmark"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label>Pin the exact location</label>
+              <div class="location-hint">
+                <i data-lucide="info" style="width: 14px; height: 14px;"></i>
+                <span>Drag the marker to adjust your location</span>
+              </div>
+              <div id="addMap"></div>
+            </div>
+
+            <button type="submit" class="btn-primary" id="submitBtn">
+              Submit Report
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <script
       src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
@@ -199,6 +453,7 @@
     ></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script type="module" src="/map.js"></script>
+    <script type="module" src="/add.js"></script>
     <script>
       lucide.createIcons();
     </script>

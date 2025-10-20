@@ -11,7 +11,8 @@
       "Bash(npm run build)",
       "Bash(git commit -m \"$(cat <<''EOF''\nFix: Update tsconfig for Vercel build compatibility\n\n- Changed module from ES2020 to NodeNext to match moduleResolution\n- Fixed seed.ts to use createMany instead of upsert with non-unique field\n- Ensures TypeScript build succeeds\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
       "Bash(git push)",
-      "Bash(git check-ignore .env)"
+      "Bash(git check-ignore .env)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nAdd interactive map page with Leaflet\n\n- Created /map.html page with Leaflet integration\n- Custom map markers showing pothole locations\n- Interactive popups with report details (title, location, status, votes)\n- Navigation links updated to route to map page\n- Auto-zoom to fit all markers\n- Responsive design matching app theme\n- Real-time data fetching from API\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
     ],
     "deny": [],
     "ask": []
