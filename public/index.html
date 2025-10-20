@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FixMyStreet - Pothole Reporter</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+          Ubuntu, Cantarell, sans-serif;
+        background-color: #f5f5f5;
+        color: #333;
+        max-width: 430px;
+        margin: 0 auto;
+        position: relative;
+        min-height: 100vh;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .header h1 {
+        font-size: 24px;
+        margin-bottom: 5px;
+      }
+
+      .header p {
+        font-size: 14px;
+        opacity: 0.9;
+      }
+
+      .stats-bar {
+        display: flex;
+        background: white;
+        padding: 15px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+
+      .stat {
+        flex: 1;
+        text-align: center;
+      }
+
+      .stat-number {
+        font-size: 24px;
+        font-weight: bold;
+        color: #667eea;
+      }
+
+      .stat-label {
+        font-size: 12px;
+        color: #666;
+        margin-top: 5px;
+      }
+
+      .filter-tabs {
+        display: flex;
+        background: white;
+        padding: 10px 15px;
+        gap: 10px;
+        overflow-x: auto;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      .tab {
+        padding: 8px 16px;
+        border-radius: 20px;
+        border: 1px solid #667eea;
+        color: #667eea;
+        font-size: 14px;
+        white-space: nowrap;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .tab.active {
+        background: #667eea;
+        color: white;
+      }
+
+      .reports-container {
+        padding: 15px;
+        padding-bottom: 100px;
+      }
+
+      .report-card {
+        background: white;
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        transition: transform 0.2s;
+      }
+
+      .report-card:active {
+        transform: scale(0.98);
+      }
+
+      .report-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 10px;
+      }
+
+      .report-title {
+        font-weight: 600;
+        font-size: 16px;
+        color: #333;
+        flex: 1;
+      }
+
+      .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .status-verified {
+        background: rgba(76, 175, 80, 0.1);
+        color: #4caf50;
+      }
+
+      .status-in-progress {
+        background: rgba(255, 193, 7, 0.1);
+        color: #ff9800;
+      }
+
+      .status-reported {
+        background: rgba(33, 150, 243, 0.1);
+        color: #2196f3;
+      }
+
+      .status-fixed {
+        background: rgba(121, 134, 203, 0.1);
+        color: #5c6bc0;
+      }
+
+      .report-location {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 10px;
+      }
+
+      .report-image {
+        width: 100%;
+        height: 180px;
+        border-radius: 12px;
+        background-size: cover;
+        background-position: center;
+        margin-bottom: 15px;
+        background-color: #e0e0e0;
+      }
+
+      .report-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+      }
+
+      .report-time {
+        color: #999;
+      }
+
+      .report-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .action-btn {
+        background: #f5f5f5;
+        padding: 8px 12px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 600;
+        color: #667eea;
+        cursor: pointer;
+        border: 1px solid transparent;
+        transition: all 0.2s;
+      }
+
+      .action-btn.active {
+        background: rgba(102, 126, 234, 0.08);
+        border-color: rgba(102, 126, 234, 0.18);
+      }
+
+      .fab {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        font-size: 32px;
+        line-height: 0;
+        box-shadow: 0 10px 20px rgba(118, 75, 162, 0.3);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .fab i {
+        width: 28px;
+        height: 28px;
+        stroke-width: 2.5;
+      }
+
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        max-width: 430px;
+        margin: 0 auto;
+        background: white;
+        border-top: 1px solid #e0e0e0;
+        display: flex;
+        justify-content: space-around;
+        padding: 10px 0;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+      }
+
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 12px;
+        color: #999;
+      }
+
+      .nav-item.active {
+        color: #667eea;
+      }
+
+      .nav-icon {
+        width: 24px;
+        height: 24px;
+        margin-bottom: 5px;
+        stroke-width: 2;
+      }
+
+      .action-btn i {
+        width: 16px;
+        height: 16px;
+        stroke-width: 2;
+      }
+
+      .empty-state {
+        text-align: center;
+        color: #999;
+        padding: 60px 20px;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <h1>FixMyStreet</h1>
+      <p>Track and report potholes in your neighborhood.</p>
+    </header>
+
+    <section class="stats-bar" id="statsBar">
+      <div class="stat">
+        <div class="stat-number" data-stat="total">0</div>
+        <div class="stat-label">Active Reports</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number" data-stat="verified">0</div>
+        <div class="stat-label">Verified</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number" data-stat="inProgress">0</div>
+        <div class="stat-label">In Progress</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number" data-stat="fixed">0</div>
+        <div class="stat-label">Fixed</div>
+      </div>
+    </section>
+
+    <nav class="filter-tabs">
+      <div class="tab active" data-filter="all">All Reports</div>
+      <div class="tab" data-filter="near">Near Me</div>
+      <div class="tab" data-filter="urgent">Urgent</div>
+      <div class="tab" data-filter="fixed">Fixed</div>
+    </nav>
+
+    <main class="reports-container">
+      <div id="reportsList"></div>
+      <div class="empty-state" id="emptyState" hidden>
+        No reports available for this filter.
+      </div>
+    </main>
+
+    <button class="fab" aria-label="Create report">
+      <i data-lucide="plus"></i>
+    </button>
+
+    <footer class="bottom-nav">
+      <div class="nav-item active">
+        <i class="nav-icon" data-lucide="home"></i>
+        <div>Home</div>
+      </div>
+      <div class="nav-item">
+        <i class="nav-icon" data-lucide="map"></i>
+        <div>Map</div>
+      </div>
+      <div class="nav-item">
+        <i class="nav-icon" data-lucide="clipboard-list"></i>
+        <div>My Reports</div>
+      </div>
+      <div class="nav-item">
+        <i class="nav-icon" data-lucide="settings"></i>
+        <div>Settings</div>
+      </div>
+    </footer>
+
+    <template id="reportTemplate">
+      <article class="report-card">
+        <div class="report-header">
+          <h2 class="report-title"></h2>
+          <span class="status-badge"></span>
+        </div>
+        <div class="report-location"></div>
+        <div class="report-image" role="img" aria-label=""></div>
+        <div class="report-meta">
+          <div class="report-time"></div>
+          <div class="report-actions">
+            <button class="action-btn" data-action="upvote">
+              <i data-lucide="thumbs-up"></i> <span class="action-count"></span>
+            </button>
+            <button class="action-btn" data-action="downvote">
+              <i data-lucide="thumbs-down"></i> <span class="action-count"></span>
+            </button>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <script type="module" src="/app.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
+</html>

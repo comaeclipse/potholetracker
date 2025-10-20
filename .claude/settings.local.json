@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install -D tsx)",
+      "Bash(npm run dev)",
+      "Bash(git init)",
+      "Bash(git remote add origin https://github.com/comaeclipse/potholetracker.git)",
+      "Bash(git add .)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

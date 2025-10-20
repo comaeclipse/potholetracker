@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ReportStatus {
+  REPORTED
+  IN_PROGRESS
+  VERIFIED
+  FIXED
+}
+
+model Report {
+  id          Int           @id @default(autoincrement())
+  title       String
+  description String
+  location    String
+  latitude    Float?
+  longitude   Float?
+  status      ReportStatus  @default(REPORTED)
+  upVotes     Int           @default(0)
+  downVotes   Int           @default(0)
+  imageUrl    String?
+  reportedAt  DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
