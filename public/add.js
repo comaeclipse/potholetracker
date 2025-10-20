@@ -127,8 +127,8 @@ form?.addEventListener("submit", async (e) => {
   const formData = new FormData(form);
   const data = {
     title: formData.get("title"),
-    description: formData.get("description"),
-    location: formData.get("location"),
+    description: "Reported via map", // Default description since field removed
+    location: formData.get("location") || "Location not specified",
     latitude: currentLat,
     longitude: currentLng
   };
