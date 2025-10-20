@@ -1,5 +1,8 @@
+// Pensacola, FL area default center (30d25'17"N 87d13'00"W)
+const DEFAULT_CENTER = { lat: 30.421389, lng: -87.216667 };
+
 // Initialize the map
-const map = L.map("map").setView([51.505, -0.09], 13);
+const map = L.map("map").setView([DEFAULT_CENTER.lat, DEFAULT_CENTER.lng], 13);
 
 // Add OpenStreetMap tiles
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -65,8 +68,10 @@ async function loadReports() {
     reports.forEach((report) => {
       // Use provided coordinates or generate random ones for demo
       // In production, you'd geocode the location or require GPS coordinates
-      const lat = report.latitude || 51.505 + (Math.random() - 0.5) * 0.1;
-      const lng = report.longitude || -0.09 + (Math.random() - 0.5) * 0.1;
+      const lat =
+        report.latitude || DEFAULT_CENTER.lat + (Math.random() - 0.5) * 0.1;
+      const lng =
+        report.longitude || DEFAULT_CENTER.lng + (Math.random() - 0.5) * 0.1;
 
       bounds.push([lat, lng]);
 
