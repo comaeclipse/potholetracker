@@ -1,8 +1,12 @@
 // Pensacola, FL area default center (30d25'17"N 87d13'00"W)
 const DEFAULT_CENTER = { lat: 30.421389, lng: -87.216667 };
+const DEFAULT_ZOOM = 12;
 
 // Initialize the map
-const map = L.map("map").setView([DEFAULT_CENTER.lat, DEFAULT_CENTER.lng], 13);
+const map = L.map("map").setView(
+  [DEFAULT_CENTER.lat, DEFAULT_CENTER.lng],
+  DEFAULT_ZOOM
+);
 
 // Add OpenStreetMap tiles
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {

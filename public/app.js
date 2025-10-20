@@ -20,6 +20,8 @@ const state = {
   filter: "all"
 };
 
+const addressCache = new Map();
+
 async function loadReports() {
   try {
     const response = await fetch("/api/reports");
@@ -77,6 +79,80 @@ function filterReports() {
   }
 }
 
+async function fetchNearestAddress(lat, lng) {
+  const key = `${lat},${lng}`;
+  const cached = addressCache.get(key);
+  if (cached) {
+    return cached;
+  }
+
+  const fetchPromise = (async () => {
+    const url = new URL("https://nominatim.openstreetmap.org/reverse");
+    url.searchParams.set("format", "jsonv2");
+    url.searchParams.set("lat", lat.toString());
+    url.searchParams.set("lon", lng.toString());
+    url.searchParams.set("zoom", "18");
+    url.searchParams.set("addressdetails", "1");
+
+    const response = await fetch(url.toString(), {
+      headers: {
+        Accept: "application/json"
+      }
+    });
+    if (!response.ok) {
+      throw new Error(`Reverse geocode failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    const road = data?.address?.road;
+    const houseNumber = data?.address?.house_number;
+    const city =
+      data?.address?.city ||
+      data?.address?.town ||
+      data?.address?.village ||
+      data?.address?.hamlet;
+    const streetParts = [houseNumber, road].filter(Boolean);
+    const streetLine =
+      streetParts.length > 0 ? streetParts.join(" ").trim() : null;
+    const address =
+      [streetLine || road, city].filter(Boolean).join(", ") ||
+      data?.display_name ||
+      null;
+    return address;
+  })();
+
+  addressCache.set(key, fetchPromise);
+
+  try {
+    const address = await fetchPromise;
+    addressCache.set(key, address);
+    return address;
+  } catch (error) {
+    addressCache.delete(key);
+    throw error;
+  }
+}
+
+async function populateLocation(locationEl, report) {
+  const fallback = report.location?.trim() || "Location unavailable";
+  locationEl.textContent = fallback;
+
+  const lat = Number(report.latitude);
+  const lng = Number(report.longitude);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+    return;
+  }
+
+  try {
+    const address = await fetchNearestAddress(lat, lng);
+    if (address && locationEl.isConnected) {
+      locationEl.textContent = address;
+    }
+  } catch (error) {
+    console.error("Reverse geocoding failed", error);
+  }
+}
+
 function renderList() {
   const filtered = filterReports();
 
@@ -101,7 +177,7 @@ function renderList() {
     titleEl.textContent = report.title;
     badgeEl.textContent = formatStatus(report.status);
     badgeEl.classList.add(statusBadgeClassMap[report.status] ?? "");
-    locationEl.textContent = `dY"? ${report.location}`;
+    populateLocation(locationEl, report);
 
     const altText = `${report.title} - ${report.location}`;
     imageEl.setAttribute("aria-label", altText);
