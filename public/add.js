@@ -125,8 +125,14 @@ form?.addEventListener("submit", async (e) => {
 
   // Get form data
   const formData = new FormData(form);
+
+  // Auto-generate title with timestamp
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
   const data = {
-    title: formData.get("title"),
+    title: `Pothole - ${dateStr} ${timeStr}`,
     description: "Reported via map", // Default description since field removed
     location: formData.get("location") || "Location not specified",
     latitude: currentLat,
