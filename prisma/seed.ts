@@ -40,13 +40,14 @@ async function main() {
     }
   ];
 
-  for (const report of reports) {
-    await prisma.report.upsert({
-      where: { title: report.title },
-      update: report,
-      create: report
-    });
-  }
+  console.log("Seeding database...");
+
+  await prisma.report.createMany({
+    data: reports,
+    skipDuplicates: true
+  });
+
+  console.log("Seeding completed!");
 }
 
 main()

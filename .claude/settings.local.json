@@ -5,7 +5,12 @@
       "Bash(npm run dev)",
       "Bash(git init)",
       "Bash(git remote add origin https://github.com/comaeclipse/potholetracker.git)",
-      "Bash(git add .)"
+      "Bash(git add .)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nInitial commit: Pothole Reporter app with Lucide icons\n\n- Express/TypeScript backend with Prisma ORM\n- Modern mobile-first frontend design\n- Migrated from emojis to Lucide icon library for consistent UI\n- ES module configuration with tsx for development\n- RESTful API for pothole report management\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push -u origin master)",
+      "Bash(npm run build)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nFix: Update tsconfig for Vercel build compatibility\n\n- Changed module from ES2020 to NodeNext to match moduleResolution\n- Fixed seed.ts to use createMany instead of upsert with non-unique field\n- Ensures TypeScript build succeeds\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push)"
     ],
     "deny": [],
     "ask": []
