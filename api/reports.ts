@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import "dotenv/config";
-import { getReports, createNewReport } from "../dist/src/services/reportService.js";
+import { getReports, createNewReport } from "../src/services/reportService.js";
 
 export default async function handler(
   req: VercelRequest,

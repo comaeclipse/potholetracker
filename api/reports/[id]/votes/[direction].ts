@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 import "dotenv/config";
-import { registerVote } from "../../../../dist/src/services/reportService.js";
+import { registerVote } from "../../../../src/services/reportService.js";
 
 export default async function handler(
   req: VercelRequest,

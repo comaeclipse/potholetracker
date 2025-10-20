@@ -4,7 +4,7 @@ import {
   getReportOrThrow,
   updateExistingReport,
   deleteReport
-} from "../../dist/src/services/reportService.js";
+} from "../../src/services/reportService.js";
 
 export default async function handler(
   req: VercelRequest,
