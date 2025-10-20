@@ -248,6 +248,8 @@
         align-items: center;
         font-size: 12px;
         color: #999;
+        text-decoration: none;
+        cursor: pointer;
       }
 
       .nav-item.active {
@@ -319,22 +321,22 @@
     </button>
 
     <footer class="bottom-nav">
-      <div class="nav-item active">
+      <a href="/" class="nav-item active">
         <i class="nav-icon" data-lucide="home"></i>
         <div>Home</div>
-      </div>
-      <div class="nav-item">
+      </a>
+      <a href="/map.html" class="nav-item">
         <i class="nav-icon" data-lucide="map"></i>
         <div>Map</div>
-      </div>
-      <div class="nav-item">
+      </a>
+      <a href="/" class="nav-item">
         <i class="nav-icon" data-lucide="clipboard-list"></i>
         <div>My Reports</div>
-      </div>
-      <div class="nav-item">
+      </a>
+      <a href="/" class="nav-item">
         <i class="nav-icon" data-lucide="settings"></i>
         <div>Settings</div>
-      </div>
+      </a>
     </footer>
 
     <template id="reportTemplate">
