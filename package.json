@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc",
+    "build": "npm run prisma:generate && tsc",
     "start": "node dist/server.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
@@ -27,6 +27,7 @@
     "@types/http-errors": "^2.0.4",
     "@types/morgan": "^1.9.7",
     "@types/node": "^20.11.30",
+    "@vercel/node": "^3.2.29",
     "prisma": "^5.15.0",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",

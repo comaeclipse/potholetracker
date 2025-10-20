@@ -15,7 +15,17 @@
       "Bash(git commit -m \"$(cat <<''EOF''\nAdd interactive map page with Leaflet\n\n- Created /map.html page with Leaflet integration\n- Custom map markers showing pothole locations\n- Interactive popups with report details (title, location, status, votes)\n- Navigation links updated to route to map page\n- Auto-zoom to fit all markers\n- Responsive design matching app theme\n- Real-time data fetching from API\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
       "Bash(git commit -m \"$(cat <<''EOF''\nAdd modal for reporting potholes with location picker\n\n- Created add.js with geolocation and draggable marker\n- Added modal overlay with form (title, description, location)\n- Integrated small Leaflet map for precise location selection\n- Users can drag marker to adjust exact pothole location\n- Auto-detects user''s current location on modal open\n- FAB button opens add modal on both home and map pages\n- Form submits to POST /api/reports with lat/lng coordinates\n- Smooth animations and responsive design\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
       "Bash(git commit -m \"$(cat <<''EOF''\nSimplify add report form: remove description, make location optional\n\n- Removed description textarea from modal form\n- Made location field optional (not required)\n- Updated placeholder text to indicate location is optional\n- Auto-fills description as \"Reported via map\" in backend\n- Auto-fills location as \"Location not specified\" if empty\n- Streamlined UX for faster pothole reporting\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(git commit -m \"$(cat <<''EOF''\nRemove title field from add report form\n\n- Removed title input field from modal form\n- Auto-generate title with timestamp: \"Pothole - [date] [time]\"\n- Ultra-simplified UX: only location (optional) + map pin\n- Fastest possible pothole reporting flow\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
+      "Bash(git commit -m \"$(cat <<''EOF''\nRemove title field from add report form\n\n- Removed title input field from modal form\n- Auto-generate title with timestamp: \"Pothole - [date] [time]\"\n- Ultra-simplified UX: only location (optional) + map pin\n- Fastest possible pothole reporting flow\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(netstat -ano)",
+      "Bash(findstr :3000)",
+      "Bash(Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object -Property LocalPort, OwningProcess)",
+      "Bash(npx prisma generate)",
+      "Bash(npx prisma migrate deploy)",
+      "Bash(npx prisma migrate dev --name init)",
+      "Bash(npx tsx prisma/seed.ts)",
+      "Bash(git add prisma/migrations)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nAdd database migration for initial schema\n\n- Created initial migration with Report table\n- Supports title, description, location, GPS coordinates\n- Status tracking (REPORTED, IN_PROGRESS, VERIFIED, FIXED)\n- Voting system (upVotes, downVotes)\n- Timestamps for reporting and updates\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
     ],
     "deny": [],
     "ask": []

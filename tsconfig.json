@@ -10,10 +10,12 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "strict": true
+    "strict": true,
+    "noImplicitAny": false
   },
   "include": [
     "src",
+    "api",
     "prisma"
   ],
   "exclude": [
