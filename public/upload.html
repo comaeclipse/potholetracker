@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload Photo - FixMyStreet</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+          Ubuntu, Cantarell, sans-serif;
+        background-color: #f5f5f5;
+        color: #333;
+        max-width: 430px;
+        margin: 0 auto;
+        position: relative;
+        min-height: 100vh;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .header h1 {
+        font-size: 24px;
+        margin-bottom: 5px;
+      }
+
+      .header p {
+        font-size: 14px;
+        opacity: 0.9;
+      }
+
+      .upload-container {
+        padding: 20px;
+        padding-bottom: 100px;
+      }
+
+      .upload-section {
+        background: white;
+        border-radius: 12px;
+        padding: 30px 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        text-align: center;
+      }
+
+      .upload-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 20px;
+        color: #667eea;
+        stroke-width: 1.5;
+      }
+
+      .upload-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .upload-description {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 25px;
+        line-height: 1.5;
+      }
+
+      .file-input-wrapper {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+        width: 100%;
+      }
+
+      .file-input-wrapper input[type=file] {
+        position: absolute;
+        left: -9999px;
+      }
+
+      .btn-upload {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .btn-upload:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn-upload:active {
+        transform: translateY(0);
+      }
+
+      .btn-upload:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .btn-upload i {
+        width: 20px;
+        height: 20px;
+        stroke-width: 2;
+      }
+
+      .preview-section {
+        display: none;
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      .preview-section.active {
+        display: block;
+      }
+
+      .preview-image {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        max-height: 400px;
+        object-fit: cover;
+      }
+
+      .exif-info {
+        text-align: left;
+        margin-bottom: 20px;
+      }
+
+      .exif-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px;
+        background: #f5f5f5;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        font-size: 14px;
+      }
+
+      .exif-item i {
+        width: 18px;
+        height: 18px;
+        color: #667eea;
+        stroke-width: 2;
+        flex-shrink: 0;
+      }
+
+      .exif-label {
+        font-weight: 600;
+        color: #333;
+        min-width: 80px;
+      }
+
+      .exif-value {
+        color: #666;
+        flex: 1;
+        word-break: break-word;
+      }
+
+      .btn-submit {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        margin-bottom: 10px;
+      }
+
+      .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+      }
+
+      .btn-submit:active {
+        transform: translateY(0);
+      }
+
+      .btn-submit:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+      }
+
+      .btn-cancel {
+        width: 100%;
+        padding: 14px;
+        background: #f5f5f5;
+        color: #666;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .btn-cancel:hover {
+        background: #e0e0e0;
+      }
+
+      .loading-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .loading-overlay.active {
+        display: flex;
+      }
+
+      .loading-content {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        text-align: center;
+        max-width: 300px;
+      }
+
+      .spinner {
+        width: 50px;
+        height: 50px;
+        margin: 0 auto 20px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+
+      .loading-text {
+        font-size: 16px;
+        color: #333;
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
+
+      .loading-subtext {
+        font-size: 14px;
+        color: #666;
+      }
+
+      .alert {
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: none;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .alert.active {
+        display: flex;
+      }
+
+      .alert-error {
+        background: #ffebee;
+        color: #c62828;
+        border: 1px solid #ef9a9a;
+      }
+
+      .alert-success {
+        background: #e8f5e9;
+        color: #2e7d32;
+        border: 1px solid #a5d6a7;
+      }
+
+      .alert i {
+        width: 20px;
+        height: 20px;
+        stroke-width: 2;
+        flex-shrink: 0;
+      }
+
+      .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        max-width: 430px;
+        margin: 0 auto;
+        background: white;
+        border-top: 1px solid #e0e0e0;
+        display: flex;
+        justify-content: space-around;
+        padding: 10px 0;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+      }
+
+      .nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 12px;
+        color: #999;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .nav-item.active {
+        color: #667eea;
+      }
+
+      .nav-icon {
+        width: 24px;
+        height: 24px;
+        margin-bottom: 5px;
+        stroke-width: 2;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <h1>Upload Photo</h1>
+      <p>Report a pothole using a photo with GPS data</p>
+    </header>
+
+    <main class="upload-container">
+      <div class="alert alert-error" id="alertError">
+        <i data-lucide="alert-circle"></i>
+        <span id="errorMessage"></span>
+      </div>
+
+      <div class="alert alert-success" id="alertSuccess">
+        <i data-lucide="check-circle"></i>
+        <span id="successMessage"></span>
+      </div>
+
+      <div class="upload-section" id="uploadSection">
+        <i class="upload-icon" data-lucide="camera"></i>
+        <h2 class="upload-title">Select a Photo</h2>
+        <p class="upload-description">
+          Choose a photo of a pothole from your device. The photo must contain GPS location data (EXIF) to automatically determine where the pothole is located.
+        </p>
+        <div class="file-input-wrapper">
+          <input
+            type="file"
+            id="photoInput"
+            accept="image/jpeg,image/jpg,image/png"
+            capture="environment"
+          />
+          <label for="photoInput" class="btn-upload">
+            <i data-lucide="upload"></i>
+            <span>Choose Photo</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="preview-section" id="previewSection">
+        <img id="previewImage" class="preview-image" alt="Preview" />
+
+        <div class="exif-info" id="exifInfo">
+          <div class="exif-item" id="dateInfo" style="display: none;">
+            <i data-lucide="calendar"></i>
+            <span class="exif-label">Date:</span>
+            <span class="exif-value" id="dateValue"></span>
+          </div>
+          <div class="exif-item" id="timeInfo" style="display: none;">
+            <i data-lucide="clock"></i>
+            <span class="exif-label">Time:</span>
+            <span class="exif-value" id="timeValue"></span>
+          </div>
+          <div class="exif-item" id="locationInfo" style="display: none;">
+            <i data-lucide="map-pin"></i>
+            <span class="exif-label">Location:</span>
+            <span class="exif-value" id="locationValue"></span>
+          </div>
+        </div>
+
+        <button class="btn-submit" id="submitBtn">
+          Submit Report
+        </button>
+        <button class="btn-cancel" id="cancelBtn">
+          Cancel
+        </button>
+      </div>
+    </main>
+
+    <div class="loading-overlay" id="loadingOverlay">
+      <div class="loading-content">
+        <div class="spinner"></div>
+        <div class="loading-text">Processing Photo</div>
+        <div class="loading-subtext">Extracting location data...</div>
+      </div>
+    </div>
+
+    <footer class="bottom-nav">
+      <a href="/" class="nav-item">
+        <i class="nav-icon" data-lucide="home"></i>
+        <div>Home</div>
+      </a>
+      <a href="/map.html" class="nav-item">
+        <i class="nav-icon" data-lucide="map"></i>
+        <div>Map</div>
+      </a>
+      <a href="/upload.html" class="nav-item active">
+        <i class="nav-icon" data-lucide="camera"></i>
+        <div>Upload</div>
+      </a>
+      <a href="/" class="nav-item">
+        <i class="nav-icon" data-lucide="settings"></i>
+        <div>Settings</div>
+      </a>
+    </footer>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script type="module" src="/upload.js"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
+</html>
