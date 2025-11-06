@@ -156,6 +156,17 @@ async function populateLocation(locationEl, report) {
 function renderList() {
   const filtered = filterReports();
 
+  // Clean up any existing Leaflet maps before clearing the DOM
+  const existingMaps = reportsList.querySelectorAll('[id^="map-"]');
+  existingMaps.forEach((mapEl) => {
+    if (mapEl._leaflet_id) {
+      const map = mapEl._leaflet;
+      if (map) {
+        map.remove();
+      }
+    }
+  });
+
   reportsList.innerHTML = "";
   emptyState.hidden = filtered.length > 0;
 
@@ -179,11 +190,47 @@ function renderList() {
     badgeEl.classList.add(statusBadgeClassMap[report.status] ?? "");
     populateLocation(locationEl, report);
 
-    const altText = `${report.title} - ${report.location}`;
+    const lat = Number(report.latitude);
+    const lng = Number(report.longitude);
+    const altText = `${report.title} - GPS: ${lat}, ${lng}`;
     imageEl.setAttribute("aria-label", altText);
-    if (report.imageUrl) {
+
+    // Create Leaflet map if valid GPS coordinates exist
+    if (Number.isFinite(lat) && Number.isFinite(lng)) {
+      // Clear any existing background
+      imageEl.style.backgroundImage = '';
+
+      // Create a unique ID for this map container
+      const mapId = `map-${report.id}`;
+      imageEl.id = mapId;
+
+      // Initialize map after a short delay to ensure DOM is ready
+      setTimeout(() => {
+        const mapContainer = document.getElementById(mapId);
+        if (!mapContainer || mapContainer._leaflet_id) {
+          return; // Skip if container doesn't exist or map already initialized
+        }
+
+        const map = L.map(mapId, {
+          scrollWheelZoom: false,
+          dragging: false,
+          zoomControl: false,
+          doubleClickZoom: false,
+          touchZoom: false,
+          attributionControl: false
+        }).setView([lat, lng], 15);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19
+        }).addTo(map);
+
+        L.marker([lat, lng]).addTo(map);
+      }, 0);
+    } else if (report.imageUrl) {
+      // Fallback to image if no GPS but image exists
       imageEl.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('${report.imageUrl}')`;
     } else {
+      // Fallback to gradient if no GPS and no image
       imageEl.style.backgroundImage =
         "linear-gradient(135deg, rgba(102, 126, 234, 0.4), rgba(118, 75, 162, 0.4))";
     }
