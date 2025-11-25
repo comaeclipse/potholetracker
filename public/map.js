@@ -56,7 +56,7 @@ async function loadReports() {
 
   try {
     const response = await fetch("/api/reports");
-    const reports = await response.json();
+    const { data: reports } = await response.json();
 
     if (!reports || reports.length === 0) {
       loading.textContent = "No reports found";
