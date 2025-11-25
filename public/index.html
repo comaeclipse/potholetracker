@@ -22,7 +22,7 @@
           Ubuntu, Cantarell, sans-serif;
         background-color: #f5f5f5;
         color: #333;
-        max-width: 430px;
+        max-width: 1250px;
         margin: 0 auto;
         position: relative;
         min-height: 100vh;
@@ -239,7 +239,7 @@
         bottom: 0;
         left: 0;
         right: 0;
-        max-width: 430px;
+        max-width: 1250px;
         margin: 0 auto;
         background: white;
         border-top: 1px solid #e0e0e0;
@@ -448,6 +448,40 @@
         opacity: 0.6;
         cursor: not-allowed;
         transform: none;
+      }
+
+      @media (min-width: 768px) {
+        #reportsList {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+          gap: 20px;
+        }
+
+        .report-card {
+          margin-bottom: 0;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .report-meta {
+          margin-top: auto;
+        }
+
+        .bottom-nav {
+          justify-content: center;
+          gap: 60px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            margin-bottom: 0;
+        }
       }
     </style>
   </head>

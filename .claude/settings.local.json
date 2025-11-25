@@ -25,7 +25,13 @@
       "Bash(npx prisma migrate dev --name init)",
       "Bash(npx tsx prisma/seed.ts)",
       "Bash(git add prisma/migrations)",
-      "Bash(git commit -m \"$(cat <<''EOF''\nAdd database migration for initial schema\n\n- Created initial migration with Report table\n- Supports title, description, location, GPS coordinates\n- Status tracking (REPORTED, IN_PROGRESS, VERIFIED, FIXED)\n- Voting system (upVotes, downVotes)\n- Timestamps for reporting and updates\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
+      "Bash(git commit -m \"$(cat <<''EOF''\nAdd database migration for initial schema\n\n- Created initial migration with Report table\n- Supports title, description, location, GPS coordinates\n- Status tracking (REPORTED, IN_PROGRESS, VERIFIED, FIXED)\n- Voting system (upVotes, downVotes)\n- Timestamps for reporting and updates\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(timeout 3 bash:*)",
+      "Bash(npm install)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(npx tsx:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []
