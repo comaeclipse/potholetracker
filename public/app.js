@@ -8,6 +8,12 @@ const statsElements = {
   fixed: document.querySelector('[data-stat="fixed"]')
 };
 
+// Edit location modal elements
+const editLocationModal = document.querySelector("#editLocationModal");
+const closeEditModalBtn = document.querySelector("#closeEditModal");
+const saveLocationBtn = document.querySelector("#saveLocationBtn");
+const editReportIdInput = document.querySelector("#editReportId");
+
 const statusBadgeClassMap = {
   VERIFIED: "status-verified",
   IN_PROGRESS: "status-in-progress",
@@ -21,6 +27,10 @@ const state = {
 };
 
 const addressCache = new Map();
+
+// Edit location map state
+let editLocationMap = null;
+let editLocationMarker = null;
 
 async function loadReports() {
   try {
@@ -240,11 +250,20 @@ function renderList() {
     upBtn.querySelector(".action-count").textContent = report.upVotes ?? 0;
     downBtn.querySelector(".action-count").textContent = report.downVotes ?? 0;
 
+    // Get edit button
+    const editBtn = node.querySelector('[data-action="edit"]');
+
+    editBtn.addEventListener("click", () => openEditLocationModal(report));
     upBtn.addEventListener("click", () => vote(report.id, "up"));
     downBtn.addEventListener("click", () => vote(report.id, "down"));
 
     reportsList.appendChild(node);
   });
+
+  // Re-initialize Lucide icons for new content
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
 }
 
 async function vote(id, direction) {
@@ -346,6 +365,124 @@ tabs.forEach((tab) => {
     state.filter = tab.dataset.filter ?? "all";
     renderList();
   });
+});
+
+// Edit location modal functions
+function openEditLocationModal(report) {
+  const lat = Number(report.latitude);
+  const lng = Number(report.longitude);
+
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+    alert("This report does not have valid GPS coordinates to edit.");
+    return;
+  }
+
+  editReportIdInput.value = report.id;
+  editLocationModal.classList.add("active");
+
+  // Initialize or update the map
+  setTimeout(() => {
+    if (editLocationMap) {
+      editLocationMap.remove();
+    }
+
+    editLocationMap = L.map("editLocationMap").setView([lat, lng], 16);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      maxZoom: 19
+    }).addTo(editLocationMap);
+
+    // Custom draggable marker icon
+    const editIcon = L.divIcon({
+      className: "custom-marker",
+      html: `<div style="background: #667eea; width: 40px; height: 40px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 3px 10px rgba(0,0,0,0.4); position: relative; top: -20px; left: -20px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(45deg);">
+          <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+      </div>`,
+      iconSize: [40, 40],
+      iconAnchor: [20, 40]
+    });
+
+    editLocationMarker = L.marker([lat, lng], {
+      icon: editIcon,
+      draggable: true
+    }).addTo(editLocationMap);
+
+    // Re-initialize Lucide icons
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+  }, 100);
+}
+
+function closeEditLocationModal() {
+  editLocationModal.classList.remove("active");
+  if (editLocationMap) {
+    editLocationMap.remove();
+    editLocationMap = null;
+    editLocationMarker = null;
+  }
+}
+
+async function saveEditedLocation() {
+  const reportId = editReportIdInput.value;
+  if (!reportId || !editLocationMarker) return;
+
+  const newLatLng = editLocationMarker.getLatLng();
+
+  saveLocationBtn.disabled = true;
+  saveLocationBtn.textContent = "Saving...";
+
+  try {
+    const response = await fetch(`/api/reports/${reportId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        latitude: newLatLng.lat,
+        longitude: newLatLng.lng
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update location");
+    }
+
+    const { data } = await response.json();
+
+    // Update the report in state
+    state.reports = state.reports.map((report) =>
+      report.id === Number(reportId) ? data : report
+    );
+
+    // Clear address cache for this location
+    const oldReport = state.reports.find(r => r.id === Number(reportId));
+    if (oldReport) {
+      addressCache.delete(`${oldReport.latitude},${oldReport.longitude}`);
+    }
+
+    closeEditLocationModal();
+    render();
+  } catch (error) {
+    console.error("Error saving location:", error);
+    alert("Failed to save location. Please try again.");
+  } finally {
+    saveLocationBtn.disabled = false;
+    saveLocationBtn.textContent = "Save Location";
+  }
+}
+
+// Edit location modal event listeners
+closeEditModalBtn.addEventListener("click", closeEditLocationModal);
+saveLocationBtn.addEventListener("click", saveEditedLocation);
+
+// Close modal when clicking outside
+editLocationModal.addEventListener("click", (e) => {
+  if (e.target === editLocationModal) {
+    closeEditLocationModal();
+  }
 });
 
 loadReports();

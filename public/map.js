@@ -15,6 +15,19 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 19
 }).addTo(map);
 
+// Edit mode state
+let editMode = false;
+const markers = new Map(); // reportId -> { marker, originalLatLng, report }
+const pendingChanges = new Map(); // reportId -> { lat, lng }
+
+// Edit mode UI elements
+const editModeBtn = document.getElementById("editModeBtn");
+const saveChangesBar = document.getElementById("saveChangesBar");
+const editModeIndicator = document.getElementById("editModeIndicator");
+const changesCount = document.getElementById("changesCount");
+const saveChangesBtn = document.getElementById("saveChangesBtn");
+const cancelChangesBtn = document.getElementById("cancelChangesBtn");
+
 // Custom icon for pothole markers
 const potholeIcon = L.divIcon({
   className: "custom-marker",
@@ -66,6 +79,13 @@ async function loadReports() {
     // Hide loading indicator
     loading.style.display = "none";
 
+    // Clear existing markers
+    markers.forEach(({ marker }) => {
+      map.removeLayer(marker);
+    });
+    markers.clear();
+    pendingChanges.clear();
+
     // Track bounds for auto-zoom
     const bounds = [];
 
@@ -101,9 +121,26 @@ async function loadReports() {
       `;
 
       // Add marker
-      const marker = L.marker([lat, lng], { icon: potholeIcon })
+      const marker = L.marker([lat, lng], { icon: potholeIcon, draggable: false })
         .addTo(map)
         .bindPopup(popupContent);
+
+      // Store marker reference for edit mode
+      markers.set(report.id, {
+        marker,
+        originalLatLng: { lat, lng },
+        report
+      });
+
+      // Handle marker drag events
+      marker.on("dragend", function(e) {
+        const newLatLng = e.target.getLatLng();
+        pendingChanges.set(report.id, {
+          lat: newLatLng.lat,
+          lng: newLatLng.lng
+        });
+        updateChangesCount();
+      });
     });
 
     // Fit map to show all markers
@@ -117,8 +154,100 @@ async function loadReports() {
   }
 }
 
+// Edit mode functions
+function toggleEditMode() {
+  editMode = !editMode;
+  editModeBtn.classList.toggle("active", editMode);
+  editModeIndicator.classList.toggle("active", editMode);
+
+  // Enable/disable dragging on all markers
+  markers.forEach(({ marker }) => {
+    if (editMode) {
+      marker.dragging.enable();
+    } else {
+      marker.dragging.disable();
+    }
+  });
+
+  // Show/hide save bar if there are pending changes
+  updateChangesCount();
+}
+
+function updateChangesCount() {
+  const count = pendingChanges.size;
+  changesCount.textContent = count;
+  saveChangesBar.classList.toggle("active", editMode && count > 0);
+}
+
+async function saveChanges() {
+  if (pendingChanges.size === 0) return;
+
+  saveChangesBtn.disabled = true;
+  saveChangesBtn.textContent = "Saving...";
+
+  try {
+    const promises = [];
+    pendingChanges.forEach((coords, reportId) => {
+      promises.push(
+        fetch(`/api/reports/${reportId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            latitude: coords.lat,
+            longitude: coords.lng
+          })
+        })
+      );
+    });
+
+    await Promise.all(promises);
+
+    // Update original positions
+    pendingChanges.forEach((coords, reportId) => {
+      const data = markers.get(reportId);
+      if (data) {
+        data.originalLatLng = { lat: coords.lat, lng: coords.lng };
+      }
+    });
+
+    pendingChanges.clear();
+    updateChangesCount();
+    
+    // Show success feedback
+    alert(`Successfully updated ${promises.length} location(s)`);
+  } catch (error) {
+    console.error("Error saving changes:", error);
+    alert("Failed to save some changes. Please try again.");
+  } finally {
+    saveChangesBtn.disabled = false;
+    saveChangesBtn.textContent = "Save Changes";
+  }
+}
+
+function cancelChanges() {
+  // Reset markers to original positions
+  pendingChanges.forEach((_, reportId) => {
+    const data = markers.get(reportId);
+    if (data) {
+      data.marker.setLatLng([data.originalLatLng.lat, data.originalLatLng.lng]);
+    }
+  });
+
+  pendingChanges.clear();
+  updateChangesCount();
+}
+
+// Event listeners for edit mode
+editModeBtn.addEventListener("click", toggleEditMode);
+saveChangesBtn.addEventListener("click", saveChanges);
+cancelChangesBtn.addEventListener("click", cancelChanges);
+
 // Load reports when page loads
 loadReports();
 
-// Refresh every 30 seconds
-setInterval(loadReports, 30000);
+// Refresh every 30 seconds (only if not in edit mode to avoid disrupting edits)
+setInterval(() => {
+  if (!editMode) {
+    loadReports();
+  }
+}, 30000);

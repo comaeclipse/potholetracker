@@ -237,10 +237,10 @@
       .bottom-nav {
         position: fixed;
         bottom: 0;
-        left: 0;
-        right: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
         max-width: 1250px;
-        margin: 0 auto;
         background: white;
         border-top: 1px solid #e0e0e0;
         display: flex;
@@ -275,6 +275,42 @@
         width: 16px;
         height: 16px;
         stroke-width: 2;
+      }
+
+      .action-btn.edit-btn {
+        background: rgba(102, 126, 234, 0.1);
+        border-color: rgba(102, 126, 234, 0.2);
+      }
+
+      .action-btn.edit-btn:hover {
+        background: rgba(102, 126, 234, 0.2);
+      }
+
+      #editLocationMap {
+        height: 300px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 2px solid #e0e0e0;
+      }
+
+      .edit-location-hint {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: #f5f5f5;
+        padding: 10px;
+        border-radius: 6px;
+      }
+
+      .edit-location-hint i {
+        width: 16px;
+        height: 16px;
+        color: #667eea;
+        stroke-width: 2;
+        flex-shrink: 0;
       }
 
       .empty-state {
@@ -558,6 +594,9 @@
         <div class="report-meta">
           <div class="report-time"></div>
           <div class="report-actions">
+            <button class="action-btn edit-btn" data-action="edit">
+              <i data-lucide="map-pin"></i>
+            </button>
             <button class="action-btn" data-action="upvote">
               <i data-lucide="thumbs-up"></i> <span class="action-count"></span>
             </button>
@@ -601,6 +640,27 @@
               Submit Report
             </button>
           </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Location Modal -->
+    <div class="modal-overlay" id="editLocationModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Edit Location</h2>
+          <button class="modal-close" id="closeEditModal" aria-label="Close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="edit-location-hint">
+            <i data-lucide="move"></i>
+            <span>Drag the marker to the correct location</span>
+          </div>
+          <div id="editLocationMap"></div>
+          <input type="hidden" id="editReportId" />
+          <button type="button" class="btn-primary" id="saveLocationBtn">
+            Save Location
+          </button>
         </div>
       </div>
     </div>

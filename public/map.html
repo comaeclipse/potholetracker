@@ -57,10 +57,10 @@
       .bottom-nav {
         position: fixed;
         bottom: 0;
-        left: 0;
-        right: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
         max-width: 1250px;
-        margin: 0 auto;
         background: white;
         border-top: 1px solid #e0e0e0;
         display: flex;
@@ -187,6 +187,115 @@
         width: 28px;
         height: 28px;
         stroke-width: 2.5;
+      }
+
+      .edit-mode-btn {
+        padding: 8px 16px;
+        border-radius: 20px;
+        border: 2px solid white;
+        background: transparent;
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+      }
+
+      .edit-mode-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .edit-mode-btn.active {
+        background: white;
+        color: #667eea;
+      }
+
+      .edit-mode-btn i {
+        width: 16px;
+        height: 16px;
+        stroke-width: 2;
+      }
+
+      .save-changes-bar {
+        position: fixed;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 1250px;
+        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        color: white;
+        padding: 12px 20px;
+        display: none;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 2000;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      }
+
+      .save-changes-bar.active {
+        display: flex;
+      }
+
+      .save-changes-bar .changes-text {
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .save-changes-bar .btn-group {
+        display: flex;
+        gap: 10px;
+      }
+
+      .save-changes-bar button {
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s;
+      }
+
+      .save-changes-bar .btn-save {
+        background: white;
+        color: #4caf50;
+      }
+
+      .save-changes-bar .btn-save:hover {
+        background: #f5f5f5;
+      }
+
+      .save-changes-bar .btn-cancel {
+        background: transparent;
+        color: white;
+        border: 1px solid white;
+      }
+
+      .save-changes-bar .btn-cancel:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .edit-mode-indicator {
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(102, 126, 234, 0.9);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        z-index: 1500;
+        display: none;
+      }
+
+      .edit-mode-indicator.active {
+        display: block;
       }
 
       /* Modal Styles */
@@ -375,9 +484,27 @@
   </head>
   <body>
     <header class="header">
-      <h1>Pothole Map</h1>
-      <p>View all reported potholes in your area</p>
+      <div>
+        <h1>Pothole Map</h1>
+        <p>View all reported potholes in your area</p>
+      </div>
+      <button class="edit-mode-btn" id="editModeBtn">
+        <i data-lucide="move"></i>
+        <span>Edit Mode</span>
+      </button>
     </header>
+
+    <div class="save-changes-bar" id="saveChangesBar">
+      <span class="changes-text"><span id="changesCount">0</span> location(s) changed</span>
+      <div class="btn-group">
+        <button class="btn-cancel" id="cancelChangesBtn">Cancel</button>
+        <button class="btn-save" id="saveChangesBtn">Save Changes</button>
+      </div>
+    </div>
+
+    <div class="edit-mode-indicator" id="editModeIndicator">
+      Drag markers to new locations
+    </div>
 
     <div id="map"></div>
     <div class="loading" id="loading">Loading map...</div>
